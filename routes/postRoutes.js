@@ -106,4 +106,25 @@ router.get('/explore', async (req, res) => {
     }
 });
 
+// Get single post by ID
+router.get('/:id', async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id)
+            .populate('user', 'username avatar')
+            .populate('category', 'name');
+
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        res.json(post);
+    } catch (err) {
+        console.error(err.message);
+        if (err.kind === 'ObjectId') {
+            return res.status(400).json({ message: 'Invalid post ID' });
+        }
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
 module.exports = router; 
